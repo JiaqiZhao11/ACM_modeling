@@ -92,8 +92,23 @@ plot_choices = function(df){
 }
 
 
-# plot the game outcomes along ntrials
+# plot the game outcomes along ntrials for singel agent
 plot_cumwin = function(df){
+  
+  df = df %>% mutate(trials = 1:nrow(df)) %>%  mutate(cumself = cumsum(feedback_self)/seq_along(feedback_self),
+                                                      cumother = cumsum(feedback_other)/seq_along(feedback_other))
+  
+  
+  return(df %>% ggplot()+theme_classic()+geom_line(color = "red",aes(trials, cumself))+geom_line(color = "blue",aes(trials, cumother))+xlab("Trial")+ylab("Procent of wins")+
+           ggtitle("Plot of Procent of wins of matcher (red) and non-matcher (blue)"))
+  
+  
+}
+
+
+
+# plot the game outcomes along ntrials for the group
+plot_cumwin_group = function(df){
   
   df = df %>% mutate(trials = 1:nrow(df)) %>%  mutate(cumself = cumsum(feedback_self)/seq_along(feedback_self),
                                                       cumother = cumsum(feedback_other)/seq_along(feedback_other))
@@ -103,8 +118,8 @@ plot_cumwin = function(df){
            theme_classic()+
            geom_line(color = "red",aes(trials, cumself))+
            geom_line(color = "blue",aes(trials, cumother))+
-           geom_ribbon(fill = "red",aes(x=trials, y= cumself, ymin = cumself - sd(cumself), ymax = cumself + sd(cumself)), alpha = 0.1) + 
-           geom_ribbon(fill = "blue",aes(x=trials, y= cumother, ymin = cumother - sd(cumother), ymax = cumother + sd(cumother)), alpha = 0.1) + 
+           geom_ribbon(fill = "red",aes(x=trials, y= cumself, ymin = cumself - cumself_sd, ymax = cumself + cumself_sd), alpha = 0.1) + 
+           geom_ribbon(fill = "blue",aes(x=trials, y= cumother, ymin = cumother - cumother_sd, ymax = cumother + cumother_sd), alpha = 0.1) + 
            xlab("Trial")+
            ylab("Procent of wins")+
            ggtitle("Plot of Procent of wins of matcher (red) and non-matcher (blue)"))

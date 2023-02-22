@@ -23,13 +23,13 @@ ntrials = 120 # when using the MixRLAgent, ntrails should be an even number
 # alpha1 is the learning rate for the first half trials of the MixRLAgent
 alpha1 = 0 # start with a random strategy
 # alpha2 is the learning rate for the first half trials of the MixRLAgent
-alpha2 = 1
+alpha2 = 0.4
 # alpha_w is the learning rate when RLAgent2 won on the previous trial
 alpha_w = 1
 # alpha_l is the learning rate when RLAgent2 lost on the previous trial
 alpha_l = 1
 # bias_self is the matcher's bias on the first trial
-bias_self = 0.4
+bias_self = 0.3
 # bias_other is the opponent's (non-matcher's) bias on the first trial
 bias_other = 0.7
 
@@ -95,14 +95,17 @@ for (n in 1:nagents){
   full_df = rbind(full_df, df)
 }
 
-# group 
+# group by trial
 full_df = group_by(full_df, trial)
 
-new_df = aggregate(full_df, list(full_df$trial), mean)
+df_mean = aggregate(full_df, list(full_df$trial), mean)
+df_sd = aggregate(full_df, list(full_df$trial), sd)
+colnames(df_sd)[2] = "self_sd"
+colnames(df_sd)[3] = "other_sd"
+group_df = cbind(df_mean, df_sd$self_sd, df_sd$other_sd)
 
-
-# plot for 
-plot_cumwin(new_df)
+# plot for the agent group
+plot_cumwin_group(group_df)
 
 ```
 
