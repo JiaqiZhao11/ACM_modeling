@@ -1,0 +1,131 @@
+---
+title: "MP_game"
+author: "Jiaqi"
+date: "2023-02-20"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+# library(LaplacesDemon) # in case the categorical functions are needed
+```
+
+
+
+
+```{r}
+source("MP_functions.R")
+
+### Test the game on one agent
+
+# set up ntrials to specify ow many trials to play 
+ntrials = 120 # when using the MixRLAgent, ntrails should be an even number
+# alpha1 is the learning rate for the first half trials of the MixRLAgent
+alpha1 = 0 # start with a random strategy
+# alpha2 is the learning rate for the first half trials of the MixRLAgent
+alpha2 = 1
+# alpha_w is the learning rate when RLAgent2 won on the previous trial
+alpha_w = 1
+# alpha_l is the learning rate when RLAgent2 lost on the previous trial
+alpha_l = 1
+# bias_self is the matcher's bias on the first trial
+bias_self = 0.4
+# bias_other is the opponent's (non-matcher's) bias on the first trial
+bias_other = 0.7
+
+df = RL_vs_MIX(ntrials = ntrials,
+               alpha1 = alpha1,
+               alpha2 = alpha2,
+               alpha_w = alpha_w,
+               alpha_l = alpha_l,
+               bias_self = bias_self,
+               bias_other = bias_other)
+
+df = as.data.frame(df)
+```
+
+
+```{r}
+plot_choices(df)
+
+```
+
+
+```{r}
+plot_cumwin(df)
+```
+
+
+```{r}
+### game with 100 agents playing as matchers
+source("MP_functions.R")
+
+ntrials = 120 # when using the MixRLAgent, ntrails should be an even number
+nagents = 100 # how many agents (matchers) are playing
+# set up the matcher's learning rates
+alpha1 = 0 # start with a random strategy on the first half trials
+alpha2 = 0.6 # followed by a reinforcement learning strategy on the last half trials
+
+# set up the non-matcher's learning rates
+alpha_w = 1 # use a WSLS agent in this case
+alpha_l = 1
+
+# set up bias for the matcher
+bias_self = 0.4
+# set up bias for the mon-matcher
+bias_other = 0.7
+
+# set up space for the data of 100 agents
+full_df = data.frame()
+
+for (n in 1:nagents){
+  
+  df = RL_vs_MIX(ntrials = ntrials,
+               alpha1 = alpha1,
+               alpha2 = alpha2,
+               alpha_w = alpha_w,
+               alpha_l = alpha_l,
+               bias_self = bias_self,
+               bias_other = bias_other)
+  
+  df = data.frame(df)
+  df$trial = 1:ntrials
+  
+  # append the df of each agent to the full_df
+  full_df = rbind(full_df, df)
+}
+
+# group 
+full_df = group_by(full_df, trial)
+
+new_df = aggregate(full_df, list(full_df$trial), mean)
+
+
+# plot for 
+plot_cumwin(new_df)
+
+```
+
+
+```{r}
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

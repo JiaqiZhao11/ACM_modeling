@@ -1,10 +1,5 @@
-RandomAgent_f <- function(bias){
-  choice <-  rbinom(1,1,bias)
-  return(choice)
-}
-
-
-
+# RLAgent2 is a reinforcement learning agent with 2 learning rates: 
+# alpha_w is toward winning and alpha_l is losing
 RLAgent2_f <- function(previous_expectation, previous_other, feedback, alpha_w, alpha_l){
   
   if (feedback == 1){
@@ -17,6 +12,8 @@ RLAgent2_f <- function(previous_expectation, previous_other, feedback, alpha_w, 
 }
 
 
+# MixRLAgent uses a strategy that combines two strategies together 
+# on the first half trials and second half trials respectively
 
 MixRLAgent_f <- function(previous_expectation, previous_other, feedback, alpha1, alpha2) {
   #probmodel = rcat(1,c(p1,p2,p3,p4)) not sure if this can be applied
@@ -86,7 +83,7 @@ RL_vs_MIX = function(ntrials, alpha_w, alpha_l, alpha1, alpha2, bias_self, bias_
   return(list(self = self, other = other, feedback_self = feedback_self, feedback_other = feedback_other))
 }
 
-
+# plot choices along ntrials
 plot_choices = function(df){
   
   return(df %>% ggplot()+theme_classic()+geom_line(color = "red",aes(1:ntrials, df$self))+geom_line(color = "blue",aes(1:ntrials, df$other))+xlab("Trial")+ylab("Choice")+
@@ -95,15 +92,22 @@ plot_choices = function(df){
 }
 
 
-
+# plot the game outcomes along ntrials
 plot_cumwin = function(df){
   
   df = df %>% mutate(trials = 1:nrow(df)) %>%  mutate(cumself = cumsum(feedback_self)/seq_along(feedback_self),
                                                       cumother = cumsum(feedback_other)/seq_along(feedback_other))
   
   
-  return(df %>% ggplot()+theme_classic()+geom_line(color = "red",aes(trials, cumself))+geom_line(color = "blue",aes(trials, cumother))+xlab("Trial")+ylab("Procent of wins")+
+  return(df %>% ggplot()+
+           theme_classic()+
+           geom_line(color = "red",aes(trials, cumself))+
+           geom_line(color = "blue",aes(trials, cumother))+
+           geom_ribbon(fill = "red",aes(x=trials, y= cumself, ymin = cumself - sd(cumself), ymax = cumself + sd(cumself)), alpha = 0.1) + 
+           geom_ribbon(fill = "blue",aes(x=trials, y= cumother, ymin = cumother - sd(cumother), ymax = cumother + sd(cumother)), alpha = 0.1) + 
+           xlab("Trial")+
+           ylab("Procent of wins")+
            ggtitle("Plot of Procent of wins of matcher (red) and non-matcher (blue)"))
-  
+
   
 }
