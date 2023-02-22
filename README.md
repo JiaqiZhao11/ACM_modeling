@@ -1,2 +1,3 @@
 # ACM_modeling
-Cognitive modeling
+Advanced Cognitive Modeling
+Assignment 1: Strategies for matching pennies game
