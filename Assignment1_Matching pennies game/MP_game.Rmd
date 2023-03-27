@@ -67,11 +67,11 @@ alpha1 = 0 # start with a random strategy on the first half trials
 alpha2 = 0.6 # followed by a reinforcement learning strategy on the last half trials
 
 # set up the non-matcher's learning rates
-alpha_w = 1 # use a WSLS agent in this case
-alpha_l = 1
+alpha_w = 0 # use a WSLS agent in this case
+alpha_l = 0
 
 # set up bias for the matcher
-bias_self = 0.4
+bias_self = 0
 # set up bias for the mon-matcher
 bias_other = 0.7
 
@@ -86,7 +86,8 @@ for (n in 1:nagents){
                alpha_w = alpha_w,
                alpha_l = alpha_l,
                bias_self = bias_self,
-               bias_other = bias_other)
+               bias_other = bias_other,
+               i = n)
   
   df = data.frame(df)
   df$trial = 1:ntrials
